@@ -1,5 +1,6 @@
 pub mod db;
 pub mod preamble;
+pub mod single_db;
 pub mod virtual_db;
 
 /// An array of "Magic" bytes, which represents this
@@ -40,6 +41,10 @@ pub enum DatabaseError {
     /// Another issue occurred that was related to an IO operation.
     /// The specific error is encapsulated.
     IoError(std::io::Error),
+
+    /// An issue related to implementation of the library.
+    /// This error is encapsulated.
+    Implementation(String),
 }
 
 impl From<std::io::Error> for DatabaseError {

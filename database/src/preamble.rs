@@ -1,26 +1,26 @@
-use std::io::{Cursor, Write};
-use byteorder::{BE, ReadBytesExt, WriteBytesExt};
-use crate::MAGIC_BYTES;
 use crate::DatabaseError;
+use crate::MAGIC_BYTES;
+use byteorder::{ReadBytesExt, WriteBytesExt, BE};
+use std::io::{Cursor, Write};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum CompressionMode {
     None,
-    Zstd
+    Zstd,
 }
 
 #[derive(Clone, Debug)]
 pub struct Preamble {
     /// The One-Link Database version.
     /// Version 1.0.0 = 100
-    version: u16,
+    pub version: u16,
     /// The compression algorithm used to compress the database.
-    compression: CompressionMode,
+    pub compression: CompressionMode,
     /// Whether or not the One-Link Database is encrypted.
     /// This is a `u8` to allow extended support for reading encrypted databases.
     /// However currently, this is treated as a boolean.
-    encryption: u8,
+    pub encryption: u8,
     // /// The checksum of the database.
     // checksum: u32,
 }
@@ -45,7 +45,7 @@ impl Preamble {
     pub fn validate_version(version: u16) -> bool {
         match version {
             100 => true,
-            _ => false
+            _ => false,
         }
     }
 
@@ -56,7 +56,7 @@ impl Preamble {
         Preamble {
             version: 100,
             compression: CompressionMode::Zstd,
-            encryption: 1
+            encryption: 1,
         }
     }
 
@@ -67,7 +67,7 @@ impl Preamble {
         Preamble {
             version: 100,
             compression: CompressionMode::Zstd,
-            encryption: 0
+            encryption: 0,
         }
     }
 
@@ -90,7 +90,7 @@ impl Preamble {
         let compression = match cursor.read_u8()? {
             0 => CompressionMode::None,
             1 => CompressionMode::Zstd,
-            _ => return Err(DatabaseError::PreambleCompressionInvalid)
+            _ => return Err(DatabaseError::PreambleCompressionInvalid),
         };
         let encryption = cursor.read_u8()?;
 
@@ -100,7 +100,7 @@ impl Preamble {
             return Ok(Self {
                 version,
                 compression,
-                encryption
+                encryption,
             });
         }
     }
@@ -112,5 +112,10 @@ impl Preamble {
         writer.write_u8(self.compression as u8)?;
         writer.write_u8(self.encryption)?;
         Ok(())
+    }
+
+    /// Gets the byte length of the preamble.
+    pub fn byte_len(&self) -> usize {
+        MAGIC_BYTES.len() + 4
     }
 }
