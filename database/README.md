@@ -12,7 +12,9 @@ A One-Link database contains the following parts:
 - [Provisional Headers](#header)
 - [Virtualization](#virtualization)
 
-## Preamble
+
+
+## 1. Preamble
 
 The preamble provides validation to verify that the database file is actually a One-Link database. The preamble reads the magic, as well as some additional data to open the database successfully.
 
@@ -69,7 +71,9 @@ pub const MAGIC_BYTES: [u8; 13] = [79, 110, 101, 108, 105, 110, 107, 32, 49, 46,
 
 ## 
 
-## Header
+
+
+## 2. Header
 
 A OneLink header contains the information required to **read** the contents of the database. The header will also exist on partitions and should be read the same as the host database.
 
