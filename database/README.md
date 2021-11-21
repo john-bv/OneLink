@@ -12,41 +12,64 @@ A One-Link database contains the following parts:
 - [Provisional Headers](#header)
 - [Virtualization](#virtualization)
 
-## Magic
+## Preamble
+
+The preamble provides validation to verify that the database file is actually a One-Link database. The preamble reads the magic, as well as some additional data to open the database successfully.
+
+---
+
+### Precedence
+
+The preamble is the **first** set of bytes in a One-Link database.
+
+---
+
+### Size
+
+| Total Bytes | Description                                                  |
+| ----------- | ------------------------------------------------------------ |
+| 17          | As of One-Link Database v1.0.0 the preamble is 17 bytes long. |
+
+---
+
+### Preamble Binary Structure
+
+| Name         | Type  | Byte Length | Description                                                  |
+| ------------ | ----- | ----------- | ------------------------------------------------------------ |
+| version      | `u16` | 2           | The Sem-ver version of the database. Currently this is `100` (v1.0.0) |
+| *compression | `u8`  | 1           | The compression kind on the database.                        |
+| **encryption | `u8`  | 1           | The encryption kind for the database. Currently this is treated as a `bool`. |
+
+> ##### Key
+>
+> | Symbol / Name | Description                                                  |
+> | ------------- | ------------------------------------------------------------ |
+> | *             | Byte is represented as [CompressionVariant]().               |
+> | **            | Byte is represented as [EncryptionVariant](#device-operating-system). |
+>
+> #### Struct representation
+>
+> ```rust
+> pub struct Preamble {
+>     version: u16,
+>     compression: u8,
+>     encryption_level: u8
+> }
+> ```
+
+### Magic
 
 The magic is a series of bytes which contain a `UTF-8 String` that matches `OneLink VERSION` where `VERSION` is `1.0.0`.
+
+Magic is the first series of bytes used in the preamble to validate that the One-Link Database is correct.
 
 ```rust
 pub const MAGIC_BYTES: [u8; 13] = [79, 110, 101, 108, 105, 110, 107, 32, 49, 46, 48, 46, 48];
 ```
 
-## Preamble
-
-The **preamble** of a OneLink database is **20** bytes in length, and contains the necessary information for validating the contents of the database, as well as decrypting the contents (if encryption is set). The preamble includes the Magic bytes required for validating a OneLink database.
-
-```rust
-pub struct Preamble {
-    /// A 2 byte integer, representing the Major to Minor version
-    /// Where `1.0.0` would be `100` and `1.3.9` would be `139`.
-    version: u16,
-    /// A single byte where:
-    /// 0 - No Compression
-    /// 1 - Zstd Compression
-    /// 2 - Zlib Compression
-    /// 3 - OneLinkDelta Compression
-    compression: u8,
-    /// A single byte where:
-    /// 0 - No Encrpytion
-    /// 1 - Sha256 rc3
-    /// 2 - AES
-    /// 3 - Two Fish
-    encryption_level: u8
-}
-```
+## 
 
 ## Header
-
-### Information
 
 A OneLink header contains the information required to **read** the contents of the database. The header will also exist on partitions and should be read the same as the host database.
 
@@ -87,22 +110,22 @@ The header is retrievable once the [database has been decrypted]().
 > | *             | If `partitioned` is true.                                    |
 > | **            | Byte is represented as [DeviceOperatingSystem](#device-operating-system). |
 >
-> 
-
-```rust
-pub struct Header {
-    pub partitioned: bool,
-    pub partition_index: Option<u8>,
-    pub partitions: Option<u8>,
-    
-    /// -- META DATA --
-    pub created_on: u8,
-    pub last_open: u128,
-    pub last_close: u128,
-    pub last_write: u128,
-    pub virtualization: bool,
-}
-```
+> #### Struct Representation
+>
+> ```rust
+> pub struct Header {
+>     pub partitioned: bool,
+>     pub partition_index: Option<u8>,
+>     pub partitions: Option<u8>,
+>     
+>     /// -- META DATA --
+>     pub created_on: u8,
+>     pub last_open: u128,
+>     pub last_close: u128,
+>     pub last_write: u128,
+>     pub virtualization: bool,
+> }
+> ```
 
 
 
