@@ -3,40 +3,19 @@ use std::any::Any;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::Cursor;
+use std::path::Path;
 
 use crate::preamble::Preamble;
+use crate::utils::GetByteLength;
 use crate::virtual_db::VirtualDatabase;
 use crate::DatabaseError;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DbDeviceOs {
     Linux,
     Windows,
     Mac,
     Unknown,
-}
-
-pub trait InternalApi {
-    /// The key type used by the internal adapter for this database.
-    type KeyKind;
-
-    /// Get a key from the database.
-    fn get(&self, key_name: String) -> Result<Self::KeyKind, DatabaseError>;
-
-    /// Set a key in the database.
-    /// This will overwrite any existing key.
-    /// If you want to add a new key, use `add_key`.
-    fn set(&mut self, key_name: String, value: Vec<u8>) -> Result<Self::KeyKind, DatabaseError>;
-
-    /// Similar to `set`, but will only create the key if it does not already exist.
-    fn add(&mut self, key_name: String, value: Vec<u8>) -> Result<Self::KeyKind, DatabaseError>;
-
-    /// Remove a key from the database.
-    /// Returns whether or not the operation succeeded.
-    fn remove(&mut self, key_name: String) -> Result<bool, DatabaseError>;
-
-    /// Fetch all keys from the database.
-    /// Returns a vector of keys.
-    fn fetch_keys() -> Result<Vec<Self::KeyKind>, DatabaseError>;
 }
 
 /// The One-Link database mode.
@@ -49,14 +28,15 @@ pub enum DatabaseMode {
 
 /// The database header.
 /// This is instiantiated after the database is opened.
+#[derive(Debug, Clone)]
 pub struct Header {
     /// Whether or not the virtual database is partitioned
     /// Partitions should only be set if you wish to split the database into multiple files.
     pub partitioned: bool,
     /// If partitioned, the partition index for this partition
-    pub partition_index: Option<u32>,
+    pub partition_index: Option<u8>,
     /// If partitioned, the number of partitions
-    pub partitions: Option<u32>,
+    pub partitions: Option<u8>,
     // The following is metadata
     /// The Operating System that created the One-Link Database.
     pub created_on: DbDeviceOs,
@@ -79,12 +59,12 @@ impl Header {
         let mut cursor = Cursor::new(data);
         let partitioned = cursor.read_u8()? != 0;
         let partition_index = if partitioned {
-            Some(cursor.read_u32::<BE>()?)
+            Some(cursor.read_u8()?)
         } else {
             None
         };
         let partitions = if partitioned {
-            Some(cursor.read_u32::<BE>()?)
+            Some(cursor.read_u8()?)
         } else {
             None
         };
@@ -109,6 +89,19 @@ impl Header {
             last_write,
             virtualization,
         })
+    }
+
+    pub fn byte_len(&self) -> usize {
+        let mut current_byte_size: usize = 1;
+        if self.partitioned {
+            // account for the partition index and partitions count
+            current_byte_size += 2;
+        }
+        // db os is 1 byte
+        // last open is 8 bytes, last close is 8 bytes, last write is 8 bytes
+        // virtualization is 1 byte
+        current_byte_size += 26;
+        return current_byte_size;
     }
 }
 
@@ -149,8 +142,8 @@ pub struct Database {
 impl Database {
     /// Opens a One-Link Database.
     /// This will open the database and read the headers.
-    pub fn open(relative_path: String) -> Result<Database, DatabaseError> {
-        let mut db_file = File::open(&relative_path)?;
+    pub fn open(name: String, path: String) -> Result<Database, DatabaseError> {
+        let mut db_file = File::open(&path)?;
         let mut buffer = BufReader::new(db_file);
         let preamble = Preamble::create(&mut buffer.buffer())?;
         let mut mode = DatabaseMode::Single;
@@ -166,20 +159,23 @@ impl Database {
                 mode = DatabaseMode::Virtual;
             } else {
                 return Err(DatabaseError::Implementation(
-                    "Non-Virtualized database are not supported".to_string(),
+                    "Non-Virtualized databases are not supported yet".to_string(),
                 ));
             }
             Ok(Database {
                 preamble,
-                header,
+                header: header.clone(),
                 mode,
                 internal: InternalDatabase::Virtual(VirtualDatabase::new(
-                    relative_path,
-                    header.partitioned,
-                    header.partition_index,
-                    header.partitions,
-                )?),
+                    header,
+                    name,
+                    Path::new(&path),
+                )),
             })
+        } else {
+            Err(DatabaseError::Implementation(
+                "Non-encrypted databases are not supported yet".to_string(),
+            ))
         }
     }
 }

@@ -1,6 +1,7 @@
 pub mod db;
 pub mod preamble;
 pub mod single_db;
+pub mod utils;
 pub mod virtual_db;
 
 /// An array of "Magic" bytes, which represents this
@@ -45,6 +46,10 @@ pub enum DatabaseError {
     /// An issue related to implementation of the library.
     /// This error is encapsulated.
     Implementation(String),
+
+    /// The following is related to the database read/write operations.
+    /// When the database key is not found. The encapsulated key is the key that was not found.
+    KeyNotFound(String),
 }
 
 impl From<std::io::Error> for DatabaseError {

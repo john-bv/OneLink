@@ -1,3 +1,4 @@
+use crate::utils::GetByteLength;
 use crate::DatabaseError;
 use crate::MAGIC_BYTES;
 use byteorder::{ReadBytesExt, WriteBytesExt, BE};
@@ -113,9 +114,14 @@ impl Preamble {
         writer.write_u8(self.encryption)?;
         Ok(())
     }
+}
 
-    /// Gets the byte length of the preamble.
-    pub fn byte_len(&self) -> usize {
-        MAGIC_BYTES.len() + 4
+impl GetByteLength for Preamble {
+    fn byte_len(&self) -> usize {
+        // Magic is 16 bytes
+        // Version is 2 bytes
+        // Compression is 1 byte
+        // Encryption is 1 byte
+        return MAGIC_BYTES.len() + 4;
     }
 }
