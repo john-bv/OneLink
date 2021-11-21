@@ -8,9 +8,9 @@ A key-value based database formatted by offsets allowing partial reads once the 
 A One-Link database contains the following parts:
 
 - [One Link Magic](#magic)
-- [The Preamble](#preamble)
-- [Provisional Headers](#header)
-- [Virtualization](#virtualization)
+- [The Preamble](#1-preamble)
+- [Provisional Headers](#2-header)
+- [Virtualization](#3-virtualization)
 
 
 
