@@ -162,14 +162,21 @@ impl InternalApi for Partition {
         })
     }
 
-    fn set(&mut self, key_name: String, value: Vec<u8>) -> Result<Self::KeyKind, DatabaseError> {}
+    fn set(&mut self, key_name: String, value: Vec<u8>) -> Result<Self::KeyKind, DatabaseError> {
+
+    }
 
     fn add(&mut self, key_name: String, value: Vec<u8>) -> Result<Self::KeyKind, DatabaseError> {}
 
     fn remove(&mut self, key_name: String) -> Result<bool, DatabaseError> {}
 
     /// This operation will reset the handle held on the partition.
-    fn fetch_keys(&mut self) -> Result<Vec<Self::KeyKind>, DatabaseError> {}
+    fn fetch_keys(&mut self) -> Result<Vec<Self::KeyKind>, DatabaseError> {
+        let mut buffer = BufReader::new(self.file.try_clone()?);
+
+        // we are now reading the length of keys.
+        let len = buffer.read_u128::<BE>()?;
+    }
 }
 
 /// The virtual database.

@@ -34,15 +34,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "database"
-version = "0.1.0"
-dependencies = [
- "byteorder",
- "sha3",
- "zstd",
-]
-
-[[package]]
 name = "digest"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -81,6 +72,15 @@ name = "libc"
 version = "0.2.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fbe5e23404da5b4f555ef85ebed98fb4083e55a00c317800bc2a50ede9f3d219"
+
+[[package]]
+name = "onelink_database"
+version = "0.1.0"
+dependencies = [
+ "byteorder",
+ "sha3",
+ "zstd",
+]
 
 [[package]]
 name = "opaque-debug"
