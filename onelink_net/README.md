@@ -6,7 +6,7 @@ The network library for onelink. Please note it mainly contains protocol not the
 
 #### Connection Handshake
 
-![Connection Handshake img](/Users/john/Documents/Programming/Personal/OneLink/resources/ConnectionRequest.png)
+![Connection Handshake img](../resources/ConnectionRequest.png)
 
 1. (C -> S) **Connection Request.** You send a packet containing the following information to the server.
    
