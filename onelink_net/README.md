@@ -16,7 +16,7 @@ The network library for onelink. Please note it mainly contains protocol not the
    
    - `mtu`: The Maximum transfer unit you would like to use. 
 
-2.  (S -> C) **Connection Reply**. You will recieve this packet AFTER sending a connection request (given that the connection was granted, if not, you will recieve a Disconnect packet). The packet contains the following fields:
+2. (S -> C) **Connection Reply**. You will recieve this packet AFTER sending a connection request (given that the connection was granted, if not, you will recieve a Disconnect packet). The packet contains the following fields:
    
    -  `duration`: The maximum amount of time you are allowed to access this server (in seconds). If this is set to `0` you are allowed indefinitely. This is usually set to prevent load on large instances with bad hardware and generally will not affect the performance of onelink.
    
@@ -24,4 +24,4 @@ The network library for onelink. Please note it mainly contains protocol not the
    
    - `heart_ack`: The acknowledge sequence. This will define how long you should send a heartbeat to the server.
 
-3- T
+3. T
