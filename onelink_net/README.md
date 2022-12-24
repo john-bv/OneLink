@@ -2,8 +2,6 @@
 
 The network library for onelink. Please note it mainly contains protocol not the server to host the protocol, for that you need to use `onelink::net::Server`
 
-
-
 #### Connection Handshake
 
 1. (C -> S) **Connection Request.** You send a packet containing the following information to the server.
@@ -18,14 +16,12 @@ The network library for onelink. Please note it mainly contains protocol not the
    
    - `mtu`: The Maximum transfer unit you would like to use. 
 
-2- (S -> C) **Connection Reply**. You will recieve this packet AFTER sending a connection request (given that the connection was granted, if not, you will recieve a Disconnect packet). The packet contains the following fields:
+2.  (S -> C) **Connection Reply**. You will recieve this packet AFTER sending a connection request (given that the connection was granted, if not, you will recieve a Disconnect packet). The packet contains the following fields:
    
-   - `duration`: The maximum amount of time you are allowed to access this server (in seconds). If this is set to `0` you are allowed indefinitely. This is usually set to prevent load on large instances with bad hardware and generally will not affect the performance of onelink.
+   -  `duration`: The maximum amount of time you are allowed to access this server (in seconds). If this is set to `0` you are allowed indefinitely. This is usually set to prevent load on large instances with bad hardware and generally will not affect the performance of onelink.
    
    - `mtu`: The MTU size the server is allowing you to use. This is NEVER higher than the MTU you set; on official servers! However, this may be LOWER than the MTU size you're requesting, in which case MUST be respected! Or the server will disconnect you.
    
    - `heart_ack`: The acknowledge sequence. This will define how long you should send a heartbeat to the server.
 
-3-  
-
-
+3- T
