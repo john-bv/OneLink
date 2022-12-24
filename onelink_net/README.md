@@ -2,7 +2,11 @@
 
 The network library for onelink. Please note it mainly contains protocol not the server to host the protocol, for that you need to use `onelink::net::Server`
 
+
+
 #### Connection Handshake
+
+![Connection Handshake img](/Users/john/Documents/Programming/Personal/OneLink/resources/ConnectionRequest.png)
 
 1. (C -> S) **Connection Request.** You send a packet containing the following information to the server.
    
